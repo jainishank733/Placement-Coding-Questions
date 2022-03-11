@@ -1,0 +1,211 @@
+import java.util.*;
+
+public class Main{
+	Scanner sc = new Scanner(System.in);
+	class Node{
+	    int val;
+	    Node left;
+	    Node right;
+	}
+	
+	private Node root;
+	Main(){
+	    this.root = construct(null, true);
+	}
+	
+	public Node construct(Node root, boolean isLeftChild){
+	    if(root == null){
+	        System.out.println("Enter root node data");
+	    }else{
+	        if(isLeftChild){
+	            System.out.println("Enter left child data of "+root.val);
+	        }else{
+	            System.out.println("Enter right child data of "+root.val);
+	        }
+	    }
+	    Node node = new Node();
+	    node.val = sc.nextInt();
+	    System.out.println("Is there any left child");
+	    boolean kyaLeftChildHai = sc.nextBoolean();
+	    if(kyaLeftChildHai){
+	        node.left = construct(node, true); 
+	    }
+	    System.out.println("Is there any right child");
+	    boolean kyaRightChildHai = sc.nextBoolean();
+	    if(kyaRightChildHai){
+	        node.right = construct(node, false);
+	    }
+	    return node;
+	    
+	}
+	
+	public void display(){
+	    this.display(this.root);
+	    System.out.println();
+	}
+	
+	public void display(Node root){
+	    if(root==null){
+	        return;
+	    }
+	    display(root.left);
+	    System.out.print(root.val+" ");
+	    display(root.right); 
+	}
+	
+	public int maxDepth(){
+	    return maxDepth(this.root); 
+	}
+	
+	public int maxDepth(Node root){
+	    if(root == null){
+	        return 0;
+	    }
+	    int leftCount = 1+maxDepth(root.left);
+	    int rightCount = 1+maxDepth(root.right);
+	    return Math.max(leftCount, rightCount);
+	} 
+	
+	public int diameterOfBinaryTree(Node root) {
+        if(root == null){
+            return 0;
+        }
+        int left = maxDepth(root.left);
+        int right = maxDepth(root.right);
+        int meraDia = left+right;
+        int leftDia = diameterOfBinaryTree(root.left);
+        int rightDia = diameterOfBinaryTree(root.right);
+        return Math.max(meraDia, Math.max(leftDia, rightDia));
+    }
+    
+    public boolean isBalanced(Node root) {
+        if(root == null){
+            return true; 
+        }    
+        int l = maxDepth(root.left);
+        int r = maxDepth(root.right);
+        int diff = Math.abs(l-r);
+        if(diff<=1){
+            boolean left = isBalanced(root.left);
+            boolean right = isBalanced(root.right);
+            return left && right;
+        }else{
+            return false;
+        }
+            
+    }
+	
+	public boolean hasPathSum(Node root, int targetSum){
+	    if(root == null){
+            return false;
+        }
+        if((targetSum-root.val) == 0 && root.left == null && root.right == null ){
+	        return true;
+	    }
+	    boolean left = hasPathSum(root.left, targetSum-root.val);
+	    boolean right = hasPathSum(root.right, targetSum-root.val);
+	    return left || right; 
+	}
+	
+	public List<List<Integer>> levelOrder(Node root) {
+        Queue<Node> bfs = new LinkedList<>();
+        List<List<Integer>> list = new ArrayList<>();
+        
+        if(root == null){
+            return list;
+        }
+        
+        bfs.add(root);
+        while(!bfs.isEmpty()){
+            List<Integer> addItems = new ArrayList<>();
+            int n = bfs.size();
+            for(int i=0; i<n; i++){
+                Node front = bfs.poll();
+                addItems.add(front.val);
+                if(front.left!=null){
+                    bfs.add(front.left);
+                }
+                if(front.right!=null){
+                    bfs.add(front.right);
+                }
+            }
+            list.add(addItems);
+        }
+        return list;
+    } 
+    
+    public List<Integer> rightSideView(Node root) {
+        Queue<Node> bfs = new LinkedList<>();
+        List<Integer> list = new ArrayList<>();
+        
+        if(root == null){
+            return list;
+        }
+        
+        bfs.add(root);
+        while(!bfs.isEmpty()){
+            Stack<Integer> addItems = new Stack<>();
+            int n = bfs.size();
+            for(int i=0; i<n; i++){
+                Node front = bfs.poll();
+                addItems.push(front.val);
+                if(front.left!=null){
+                    bfs.add(front.left);
+                }
+                if(front.right!=null){
+                    bfs.add(front.right);
+                }
+            }
+            list.add(addItems.pop());
+        }
+        return list;
+    } 
+    
+    class Pair{
+        Node node;
+        int vertLvl; 
+        Pair(Node node, int vertLvl){
+            this.node = node;
+            this.vertLvl = vertLvl;
+        }  
+    } 
+    
+    public void vertOrder(){
+        vertOrder(this.root);
+    }
+     
+    public void vertOrder(Node root){
+        Queue<Pair> bfs = new LinkedList<>();
+        bfs.add(new Pair(root, 0));
+        
+        Map<Integer, List<Integer>> map = new TreeMap<>();
+        while(!bfs.isEmpty()){
+            Pair pair = bfs.poll();
+            Node front = pair.node;
+            int vertLvl = pair.vertLvl;
+            
+            List<Integer> list = map.getOrDefault(vertLvl, new ArrayList<>()); 
+            list.add(front.val);
+            map.put(vertLvl, list);
+            
+            if(front.left!=null){
+                bfs.add(new Pair(front.left, vertLvl-1));
+            }
+            if(front.right!=null){
+                bfs.add(new Pair(front.right, vertLvl+1));
+            }
+            
+        }
+        System.out.println(map);
+    }
+	
+	public static void main(String[] args) {
+		Main m = new Main();
+		m.display();
+		m.vertOrder();
+		
+	} 
+}
+
+
+
